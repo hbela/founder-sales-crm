@@ -1,0 +1,32 @@
+# dependencies
+node_modules
+.pnpm-store
+
+# builds
+dist
+build
+*.tsbuildinfo
+
+# env
+.env
+.env.local
+.env.*.local
+
+# prisma generated (keep schema, ignore generated client artifacts if any)
+packages/db/generated
+
+# logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# editor / os
+.DS_Store
+.idea
+.vscode/*
+!.vscode/extensions.json
+Thumbs.db
+
+# misc
+coverage
+.cache
