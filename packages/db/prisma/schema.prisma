@@ -1,0 +1,192 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ContactStatus {
+  NEW
+  CONTACTED
+  REPLIED
+  INTERESTED
+  MEETING_BOOKED
+  CUSTOMER
+  LOST
+}
+
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+}
+
+enum OutreachStatus {
+  PENDING
+  SENDING
+  SENT
+  FAILED
+}
+
+enum FollowUpStatus {
+  PENDING
+  COMPLETED
+}
+
+enum ActivityType {
+  CONTACT_CREATED
+  CONTACT_UPDATED
+  EMAIL_SENT
+  REPLY_RECEIVED
+  MEETING_BOOKED
+  STATUS_CHANGED
+  FOLLOWUP_DUE
+  FOLLOWUP_COMPLETED
+  NOTE_ADDED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      String   @default("ADMIN")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  activities Activity[] @relation("ActivityAuthor")
+
+  @@map("users")
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  website     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  contacts   Contact[]   @relation("ProductContacts")
+  campaigns  Campaign[]
+  templates  EmailTemplate[]
+
+  @@map("products")
+}
+
+model Contact {
+  id        String   @id @default(cuid())
+  firstName String
+  lastName  String
+  company   String?
+  email     String   @unique
+  phone     String?
+  website   String?
+  industry  String?
+  country   String?
+  notes     String?
+  status    ContactStatus @default(NEW)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  productId String?
+  product   Product? @relation("ProductContacts", fields: [productId], references: [id], onDelete: SetNull)
+
+  outreach  Outreach[]
+  followups FollowUp[]
+  activities Activity[]
+
+  @@index([status])
+  @@map("contacts")
+}
+
+model Campaign {
+  id           String         @id @default(cuid())
+  name         String
+  productId    String
+  targetMarket String?
+  startDate    DateTime?
+  endDate      DateTime?
+  status       CampaignStatus @default(DRAFT)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  product  Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  outreach Outreach[]
+
+  @@index([status])
+  @@map("campaigns")
+}
+
+model EmailTemplate {
+  id        String   @id @default(cuid())
+  name      String
+  subject   String
+  body      String
+  productId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product  Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+  outreach Outreach[]
+
+  @@map("email_templates")
+}
+
+model Outreach {
+  id          String         @id @default(cuid())
+  contactId   String
+  campaignId  String
+  templateId  String
+  scheduledAt DateTime       @default(now())
+  sentAt      DateTime?
+  status      OutreachStatus @default(PENDING)
+  errorMessage String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  contact  Contact       @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  campaign Campaign      @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  template EmailTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([scheduledAt])
+  @@map("outreach")
+}
+
+model FollowUp {
+  id        String         @id @default(cuid())
+  contactId String
+  dueDate   DateTime
+  note      String?
+  status    FollowUpStatus @default(PENDING)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([dueDate])
+  @@map("followups")
+}
+
+model Activity {
+  id          String   @id @default(cuid())
+  contactId   String
+  type        ActivityType
+  description String
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  author  User?   @relation("ActivityAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  authorId String?
+
+  @@index([contactId])
+  @@index([type])
+  @@map("activities")
+}

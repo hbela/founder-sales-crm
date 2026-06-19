@@ -7,9 +7,7 @@ git init
 pnpm init
 ```
 
-Create workspace:
 
-```bash
 mkdir apps packages
 mkdir apps/api apps/web
 mkdir packages/config packages/db packages/types
