@@ -13,7 +13,14 @@
     "db:migrate": "prisma migrate dev --schema=packages/db/prisma/schema.prisma",
     "db:deploy": "prisma migrate deploy --schema=packages/db/prisma/schema.prisma",
     "db:seed": "tsx packages/db/prisma/seed.ts",
-    "db:studio": "prisma studio --schema=packages/db/prisma/schema.prisma"
+    "db:studio": "prisma studio --schema=packages/db/prisma/schema.prisma",
+    "video": "pnpm --filter @founder-crm/video-generator video",
+    "video:scenes": "pnpm --filter @founder-crm/video-generator video:scenes",
+    "video:screens": "pnpm --filter @founder-crm/video-generator video:screens",
+    "video:voice": "pnpm --filter @founder-crm/video-generator video:voice",
+    "video:render": "pnpm --filter @founder-crm/video-generator video:render",
+    "video:studio": "pnpm --filter @founder-crm/video-generator video:studio",
+    "video:browsers": "pnpm --filter @founder-crm/video-generator video:browsers"
   },
   "packageManager": "pnpm@10.32.1",
   "engines": {
@@ -21,10 +28,16 @@
   },
   "devDependencies": {
     "prisma": "^5.22.0",
+    "remotion": "^4.0.481",
     "tsx": "^4.19.2",
     "typescript": "^5.6.3"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["@prisma/client", "@prisma/engines", "prisma", "esbuild"]
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "prisma",
+      "esbuild"
+    ]
   }
 }
