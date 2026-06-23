@@ -16,7 +16,7 @@ import { OutreachStatusBadge } from "@/components/StatusBadge";
 import { useOutreach, useContacts, useCampaigns, useTemplates } from "@/lib/hooks";
 import { api, ApiError } from "@/lib/api";
 import { OUTREACH_STATUSES, type OutreachStatus } from "@founder-crm/types";
-import { formatDateTime } from "@/lib/utils";
+import { formatDateTime, getInitials } from "@/lib/utils";
 
 export function Outreach() {
   const { data: items, isLoading } = useOutreach();
@@ -120,8 +120,15 @@ export function Outreach() {
               filtered.map((o) => (
                 <TableRow key={o.id}>
                   <TableCell>
-                    <button className="font-medium hover:underline" onClick={() => navigate({ to: "/contacts/$id", params: { id: o.contactId } })}>
-                      {o.contact ? `${o.contact.firstName} ${o.contact.lastName}` : o.contactId}
+                    <button className="flex items-center gap-3 text-left" onClick={() => navigate({ to: "/contacts/$id", params: { id: o.contactId } })}>
+                      {o.contact && (
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                          {getInitials(o.contact.firstName, o.contact.lastName)}
+                        </span>
+                      )}
+                      <span className="font-medium hover:underline">
+                        {o.contact ? `${o.contact.firstName} ${o.contact.lastName}` : o.contactId}
+                      </span>
                     </button>
                   </TableCell>
                   <TableCell className="text-muted-foreground">{o.campaign?.name ?? "—"}</TableCell>

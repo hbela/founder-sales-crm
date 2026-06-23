@@ -109,8 +109,17 @@ export function Campaigns() {
             ) : campaigns && campaigns.length > 0 ? (
               campaigns.map((c) => (
                 <TableRow key={c.id}>
-                  <TableCell className="font-medium">{c.name}</TableCell>
-                  <TableCell>{c.product?.name ?? "—"}</TableCell>
+                  <TableCell className="font-medium">
+                    <div className="font-medium">{c.name}</div>
+                    <div className="text-xs text-muted-foreground">Created {formatDate(c.createdAt)}</div>
+                  </TableCell>
+                  <TableCell>
+                    {c.product?.name ? (
+                      <span className="inline-block rounded bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                        {c.product.name}
+                      </span>
+                    ) : "—"}
+                  </TableCell>
                   <TableCell className="text-muted-foreground">{c.targetMarket ?? "—"}</TableCell>
                   <TableCell className="text-muted-foreground">
                     {c.startDate ? formatDate(c.startDate) : "—"}{c.endDate ? ` → ${formatDate(c.endDate)}` : ""}

@@ -116,7 +116,7 @@ export function Templates() {
       ) : templates && templates.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {templates.map((t) => (
-            <Card key={t.id}>
+            <Card key={t.id} className="transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
               <CardContent className="p-4">
                 <div className="mb-2 flex items-start justify-between">
                   <div>

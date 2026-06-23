@@ -1,0 +1,63 @@
+{
+  "name": "Founder Sales CRM",
+  "category": "Sales / CRM",
+  "techStack": "Turbo, Fastify, React, Prisma, PostgreSQL",
+  "pricing": "Free + Pro $29/mo",
+  "description": "Outreach-first sales pipeline built for founders. Manage contacts, track deals through a pipeline, run outreach campaigns, send reusable email templates, and never miss a follow-up.",
+  "brand": {
+    "name": "Founder CRM",
+    "tagline": "Sales pipeline for founders",
+    "primaryColor": "#0047AB",
+    "darkColor": "#0A1931"
+  },
+  "features": [
+    {
+      "name": "Dashboard",
+      "description": "Clear overview of your pipeline at a glance: contacts, emails sent, replies, meetings booked, customers won, and follow-ups due today.",
+      "route": "/dashboard",
+      "techDetails": "React, TanStack Query, Fastify API"
+    },
+    {
+      "name": "Contacts",
+      "description": "Single source of truth for every lead. Search and filter by status or company, then open any contact to see their full history.",
+      "route": "/contacts",
+      "techDetails": "Prisma ORM, PostgreSQL"
+    },
+    {
+      "name": "Pipeline",
+      "description": "Visualizes your deals as they move from new lead to customer. Spot bottlenecks at a glance and keep every deal moving forward.",
+      "route": "/pipeline",
+      "techDetails": "React, drag-and-drop Kanban"
+    },
+    {
+      "name": "Campaigns",
+      "description": "Organize your outreach by product and target market. Set a window, track status from draft to completed, and measure what works.",
+      "route": "/campaigns",
+      "techDetails": "Fastify, Prisma, zod validation"
+    },
+    {
+      "name": "Templates",
+      "description": "Write reusable emails with variables like first name and company. Preview exactly how a message looks before it goes out.",
+      "route": "/templates",
+      "techDetails": "React, template variable interpolation"
+    },
+    {
+      "name": "Outreach",
+      "description": "The outreach queue is where your emails get sent. Queue one contact or hundreds, schedule them, and watch each move from pending to sent.",
+      "route": "/outreach",
+      "techDetails": "Fastify, node-cron scheduling"
+    },
+    {
+      "name": "Follow-ups",
+      "description": "Make sure nothing slips through the cracks. See tasks due today, add notes, and mark them complete as you turn replies into meetings.",
+      "route": "/followups",
+      "techDetails": "React, TanStack Query"
+    },
+    {
+      "name": "Products",
+      "description": "Products are the things you sell. Define each with a name, description, and website, then attach contacts, campaigns, and templates to it.",
+      "route": "/products",
+      "techDetails": "Prisma, relational data model"
+    }
+  ]
+}

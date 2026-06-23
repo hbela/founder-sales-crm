@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FollowupStatusBadge } from "@/components/StatusBadge";
 import { useFollowups, useContacts } from "@/lib/hooks";
 import { api, ApiError } from "@/lib/api";
-import { formatDate } from "@/lib/utils";
+import { formatDate, getInitials, cn } from "@/lib/utils";
 
 export function Followups() {
   const navigate = useNavigate();
@@ -112,17 +112,26 @@ export function Followups() {
             <Skeleton className="h-32" />
           ) : followups && followups.length > 0 ? (
             <ul className="space-y-2">
-              {followups.map((f) => (
-                <li key={f.id} className="flex items-center justify-between rounded-md border p-3">
-                  <div>
-                    <button
-                      className="font-medium hover:underline"
-                      onClick={() => navigate({ to: "/contacts/$id", params: { id: f.contactId } })}
-                    >
-                      {f.contact ? `${f.contact.firstName} ${f.contact.lastName}` : "Contact"}
-                    </button>
-                    {f.contact?.company && <span className="text-muted-foreground"> · {f.contact.company}</span>}
-                    <p className="text-sm text-muted-foreground">Due {formatDate(f.dueDate)}{f.note ? ` — ${f.note}` : ""}</p>
+              {followups.map((f) => {
+                const overdue = f.status === "PENDING" && new Date(f.dueDate) < new Date(new Date().toDateString());
+                return (
+                <li key={f.id} className="flex items-center justify-between rounded-md border p-3 transition-colors hover:bg-muted/50">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                      {f.contact ? getInitials(f.contact.firstName, f.contact.lastName) : "?"}
+                    </span>
+                    <div>
+                      <button
+                        className="font-medium hover:underline"
+                        onClick={() => navigate({ to: "/contacts/$id", params: { id: f.contactId } })}
+                      >
+                        {f.contact ? `${f.contact.firstName} ${f.contact.lastName}` : "Contact"}
+                      </button>
+                      {f.contact?.company && <span className="text-muted-foreground"> · {f.contact.company}</span>}
+                      <p className="text-sm text-muted-foreground">
+                        Due <span className={cn(overdue && "font-medium text-destructive")}>{formatDate(f.dueDate)}</span>{f.note ? ` — ${f.note}` : ""}
+                      </p>
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <FollowupStatusBadge status={f.status} />
@@ -132,7 +141,8 @@ export function Followups() {
                     <Button size="icon" variant="ghost" onClick={() => remove(f.id)}><Trash2 className="h-4 w-4" /></Button>
                   </div>
                 </li>
-              ))}
+                );
+              })}
             </ul>
           ) : (
             <p className="py-8 text-center text-sm text-muted-foreground">No follow-ups here. You're all caught up.</p>

@@ -1,0 +1,36 @@
+{
+  "name": "@founder-crm/new-video",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "video:script": "tsx src/scripts/1-generate-script.ts",
+    "video:scenes": "tsx src/scripts/2-script-to-scenes.ts",
+    "video:screens": "tsx src/scripts/3-capture-screenshots.ts",
+    "video:voice": "tsx src/scripts/4-generate-voice.ts",
+    "video:render": "tsx src/scripts/5-render-video.ts",
+    "video:browsers": "playwright install chromium",
+    "video:studio": "tsx src/scripts/6-studio-props.ts && remotion studio src/remotion/Root.tsx --props src/output/studio-props.json --port 3001",
+    "video": "pnpm video:script && pnpm video:scenes && pnpm video:screens && pnpm video:voice && pnpm video:render",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/bundler": "^4.0.0",
+    "@remotion/renderer": "^4.0.0",
+    "dotenv": "^16.4.5",
+    "openai": "^4.77.0",
+    "playwright": "^1.49.0",
+    "remotion": "^4.0.0",
+    "zod": "4.3.6"
+  },
+  "devDependencies": {
+    "@remotion/cli": "^4.0.0",
+    "@types/node": "^22.9.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}

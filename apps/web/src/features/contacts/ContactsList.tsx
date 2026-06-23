@@ -12,7 +12,7 @@ import { ContactStatusBadge } from "@/components/StatusBadge";
 import { ContactForm } from "./ContactForm";
 import { useContacts, useProducts, type Contact } from "@/lib/hooks";
 import { CONTACT_STATUSES, type ContactStatus } from "@founder-crm/types";
-import { formatDate } from "@/lib/utils";
+import { formatDate, getInitials } from "@/lib/utils";
 
 export function ContactsList() {
   const navigate = useNavigate();
@@ -101,7 +101,14 @@ export function ContactsList() {
             ) : data && data.items.length > 0 ? (
               data.items.map((c) => (
                 <TableRow key={c.id} className="cursor-pointer" onClick={() => navigate({ to: "/contacts/$id", params: { id: c.id } })}>
-                  <TableCell className="font-medium">{c.firstName} {c.lastName}</TableCell>
+                  <TableCell className="font-medium">
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                        {getInitials(c.firstName, c.lastName)}
+                      </span>
+                      {c.firstName} {c.lastName}
+                    </div>
+                  </TableCell>
                   <TableCell>{c.company ?? "—"}</TableCell>
                   <TableCell className="text-muted-foreground">{c.email}</TableCell>
                   <TableCell>{c.product?.name ?? "—"}</TableCell>

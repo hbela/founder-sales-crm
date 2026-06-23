@@ -22,3 +22,7 @@ export function formatDate(date: string | Date): string {
     day: "numeric",
   });
 }
+
+export function getInitials(first?: string | null, last?: string | null): string {
+  return `${(first ?? "").charAt(0)}${(last ?? "").charAt(0)}`.toUpperCase() || "?";
+}

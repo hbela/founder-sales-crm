@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -96,35 +97,35 @@ export function ContactForm({ open, onOpenChange, contact, onSaved }: Props) {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="firstName">First name *</Label>
-              <Input id="firstName" value={form.firstName} onChange={(e) => set("firstName", e.target.value)} required />
+              <Input id="firstName" placeholder="e.g. Sarah" value={form.firstName} onChange={(e) => set("firstName", e.target.value)} required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="lastName">Last name *</Label>
-              <Input id="lastName" value={form.lastName} onChange={(e) => set("lastName", e.target.value)} required />
+              <Input id="lastName" placeholder="e.g. Jenkins" value={form.lastName} onChange={(e) => set("lastName", e.target.value)} required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="company">Company</Label>
-              <Input id="company" value={form.company} onChange={(e) => set("company", e.target.value)} />
+              <Input id="company" placeholder="Global Tech Corp" value={form.company} onChange={(e) => set("company", e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email *</Label>
-              <Input id="email" type="email" value={form.email} onChange={(e) => set("email", e.target.value)} required />
+              <Input id="email" type="email" placeholder="sarah@company.com" value={form.email} onChange={(e) => set("email", e.target.value)} required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="phone">Phone</Label>
-              <Input id="phone" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
+              <Input id="phone" placeholder="+1 (555) 000-0000" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="website">Website</Label>
-              <Input id="website" value={form.website} onChange={(e) => set("website", e.target.value)} />
+              <Input id="website" placeholder="https://example.com" value={form.website} onChange={(e) => set("website", e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="industry">Industry</Label>
-              <Input id="industry" value={form.industry} onChange={(e) => set("industry", e.target.value)} />
+              <Input id="industry" placeholder="e.g. SaaS" value={form.industry} onChange={(e) => set("industry", e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="country">Country</Label>
-              <Input id="country" value={form.country} onChange={(e) => set("country", e.target.value)} />
+              <Input id="country" placeholder="e.g. United States" value={form.country} onChange={(e) => set("country", e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label>Status</Label>
@@ -152,11 +153,11 @@ export function ContactForm({ open, onOpenChange, contact, onSaved }: Props) {
           </div>
           <div className="space-y-2">
             <Label htmlFor="notes">Notes</Label>
-            <Textarea id="notes" value={form.notes} onChange={(e) => set("notes", e.target.value)} rows={3} />
+            <Textarea id="notes" placeholder="Add any specific context or previous conversation summaries..." value={form.notes} onChange={(e) => set("notes", e.target.value)} rows={3} />
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit" disabled={loading}>{loading ? "Saving..." : "Save"}</Button>
+            <Button type="submit" disabled={loading}><Save className="h-4 w-4" /> {loading ? "Saving..." : "Save contact"}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Founder CRM | Outreach Queue</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                DEFAULT: "#0047ab",
+                foreground: "#ffffff"
+              },
+              accent: {
+                DEFAULT: "#9effa9",
+                foreground: "#0a1931"
+              },
+              background: "#f2eded",
+              foreground: "#0a1931",
+              card: "#ffffff",
+              destructive: "#e11d48",
+              sidebar: "#0a1931",
+              border: "#248f4d"
+            },
+            borderRadius: {
+              "DEFAULT": "0.5rem",
+              "lg": "1rem",
+              "xl": "1.5rem",
+              "full": "9999px"
+            },
+            fontFamily: {
+              headline: ["DM Sans", "sans-serif"],
+              display: ["DM Sans", "sans-serif"],
+              body: ["DM Sans", "sans-serif"],
+              label: ["DM Sans", "sans-serif"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      body { font-family: 'DM Sans', sans-serif; letter-spacing: 0.02em; }
+      .material-symbols-outlined { font-size: 20px; vertical-align: middle; }
+      .glass-effect { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); }
+      .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+      .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+      .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-foreground min-h-screen flex">
+<!-- Fixed Left Sidebar -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-[#0a1931] dark:bg-[#00050d] text-white flex flex-col py-6 shadow-lg z-50 overflow-y-auto custom-scrollbar">
+<!-- Brand Header -->
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">rocket_launch</span>
+</div>
+<div>
+<h1 class="text-xl font-headline font-semibold text-white leading-none">Founder CRM</h1>
+<p class="text-[10px] uppercase tracking-[0.2em] text-slate-400 mt-1">Sales Engine</p>
+</div>
+</div>
+</div>
+<!-- Navigation Tabs -->
+<nav class="flex-1 space-y-1">
+<!-- Navigation Items Mapping from JSON -->
+<a class="text-slate-300 hover:text-white hover:bg-[#0047ab]/20 transition-colors rounded-lg mx-2 px-4 py-2 flex items-center gap-3 group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">dashboard</span>
+<span class="font-body text-label tracking-wide">Dashboard</span>
+</a>
+<a class="text-slate-300 hover:text-white hover:bg-[#0047ab]/20 transition-colors rounded-lg mx-2 px-4 py-2 flex items-center gap-3 group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">group</span>
+<span class="font-body text-label tracking-wide">Contacts</span>
+</a>
+<a class="text-slate-300 hover:text-white hover:bg-[#0047ab]/20 transition-colors rounded-lg mx-2 px-4 py-2 flex items-center gap-3 group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">trolley</span>
+<span class="font-body text-label tracking-wide">Pipeline</span>
+</a>
+<a class="text-slate-300 hover:text-white hover:bg-[#0047ab]/20 transition-colors rounded-lg mx-2 px-4 py-2 flex items-center gap-3 group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">campaign</span>
+<span class="font-body text-label tracking-wide">Campaigns</span>
+</a>
+<a class="text-slate-300 hover:text-white hover:bg-[#0047ab]/20 transition-colors rounded-lg mx-2 px-4 py-2 flex items-center gap-3 group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">description</span>
+<span class="font-body text-label tracking-wide">Templates</span>
+</a>
+<!-- ACTIVE TAB: Outreach Queue -->
+<a class="bg-[#0047ab] text-white rounded-lg mx-2 px-4 py-2 flex items-center gap-3 shadow-md shadow-primary/20 scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">pending_actions</span>
+<span class="font-body text-label tracking-wide font-medium">Outreach Queue</span>
+</a>
+<a class="text-slate-300 hover:text-white hover:bg-[#0047ab]/20 transition-colors rounded-lg mx-2 px-4 py-2 flex items-center gap-3 group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">notifications_active</span>
+<span class="font-body text-label tracking-wide">Follow-ups</span>
+</a>
+<a class="text-slate-300 hover:text-white hover:bg-[#0047ab]/20 transition-colors rounded-lg mx-2 px-4 py-2 flex items-center gap-3 group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">inventory_2</span>
+<span class="font-body text-label tracking-wide">Products</span>
+</a>
+</nav>
+<!-- CTA & Footer -->
+<div class="px-4 mt-6">
+<button class="w-full bg-primary hover:bg-blue-700 text-white rounded-lg py-2.5 px-4 flex items-center justify-center gap-2 font-semibold shadow-lg shadow-primary/20 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-sm">add</span>
+<span>New Deal</span>
+</button>
+</div>
+<div class="mt-auto pt-6 border-t border-slate-700/50">
+<a class="text-slate-300 hover:text-white rounded-lg mx-2 px-4 py-2 flex items-center gap-3 transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body text-label tracking-wide">Settings</span>
+</a>
+<a class="text-slate-300 hover:text-white rounded-lg mx-2 px-4 py-2 flex items-center gap-3 transition-colors" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-body text-label tracking-wide">Support</span>
+</a>
+</div>
+</aside>
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 right-0 left-64 h-16 bg-white dark:bg-[#0a1931] border-b border-[#248f4d]/20 shadow-sm z-40 px-6 flex items-center justify-between">
+<!-- Search -->
+<div class="flex items-center flex-1 max-w-md">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-50 border-none rounded-lg focus:ring-2 focus:ring-primary/20 text-sm placeholder:text-slate-400" placeholder="Search leads, campaigns or tasks..." type="text"/>
+</div>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-4">
+<button class="relative p-2 text-slate-500 hover:text-primary transition-colors opacity-80 hover:opacity-100">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-destructive rounded-full"></span>
+</button>
+<div class="h-8 w-[1px] bg-slate-200 mx-2"></div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<p class="text-sm font-semibold text-foreground leading-none">Alex Rivera</p>
+<p class="text-[11px] text-slate-500 mt-1">Sales Director</p>
+</div>
+<div class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a Hispanic male sales director in a crisp white shirt, photographed with soft cinematic lighting against a blurred office background, high-end corporate photography style with a cobalt blue color palette emphasis." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD68eRX0-U4Fny9UCGbw5uxPzRtacFcIRP_4Cb3tGJ8d4cCOEarRQjlHAfCR6hO0N3KN_3OdSGCTvE55ObRf6jcI2TAKVYgF7Z5L7SALs2sn7VFtncEtuuCv8vTRbcfOyv8OkDqhdCa368YPjD1OZWtchjSMIfR_SZO6PwlaKx6AJNgVKRgZ_w-nFfSRUMzcT3CzXMpAvKapN1XInfZ6ue8F44JSqN5ALUM0JU60_ERItGzpUQc4-yCKxHU60acCGm5ODW3dNXHiMc"/>
+</div>
+<button class="ml-2 px-3 py-1.5 border border-slate-300 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-50 transition-colors opacity-80 hover:opacity-100">
+                    Logout
+                </button>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 mt-16 p-6 flex-1 w-full max-w-[1600px] mx-auto">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+<div>
+<h2 class="text-2xl font-semibold text-foreground">Outreach Queue</h2>
+<p class="text-slate-500 text-sm mt-1">Review and send scheduled emails safely</p>
+</div>
+<button class="bg-primary hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg flex items-center justify-center gap-2 font-semibold shadow-lg shadow-primary/20 active:scale-95 transition-all">
+<span class="material-symbols-outlined">add</span>
+<span>Queue Email</span>
+</button>
+</div>
+<!-- Bento Stats / Summary (Supplementary UI) -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+<div class="bg-white p-5 rounded-lg border border-slate-100 shadow-sm flex items-center gap-4">
+<div class="w-11 h-11 bg-primary/10 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">send</span>
+</div>
+<div>
+<p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Scheduled Today</p>
+<p class="text-2xl font-semibold">42</p>
+</div>
+</div>
+<div class="bg-white p-5 rounded-lg border border-slate-100 shadow-sm flex items-center gap-4">
+<div class="w-11 h-11 bg-amber-100 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-amber-600" style="font-variation-settings: 'FILL' 1;">sync</span>
+</div>
+<div>
+<p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Sending Now</p>
+<p class="text-2xl font-semibold">3</p>
+</div>
+</div>
+<div class="bg-white p-5 rounded-lg border border-slate-100 shadow-sm flex items-center gap-4">
+<div class="w-11 h-11 bg-emerald-100 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-emerald-600" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div>
+<p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Successfully Sent</p>
+<p class="text-2xl font-semibold">1,204</p>
+</div>
+</div>
+<div class="bg-white p-5 rounded-lg border border-slate-100 shadow-sm flex items-center gap-4">
+<div class="w-11 h-11 bg-rose-100 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-rose-600" style="font-variation-settings: 'FILL' 1;">error</span>
+</div>
+<div>
+<p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Failed Attempts</p>
+<p class="text-2xl font-semibold text-rose-600">8</p>
+</div>
+</div>
+</div>
+<!-- Filter Bar -->
+<div class="bg-white rounded-lg border border-[#248f4d]/20 shadow-sm p-4 mb-6 flex flex-wrap items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Filter by:</span>
+<div class="relative">
+<select class="appearance-none pl-3 pr-8 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/40 cursor-pointer outline-none">
+<option>All statuses</option>
+<option>Pending</option>
+<option>Sending</option>
+<option>Sent</option>
+<option>Failed</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-sm">expand_more</span>
+</div>
+</div>
+<div class="h-6 w-[1px] bg-slate-200 hidden sm:block"></div>
+<div class="flex-1 flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
+<span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-medium cursor-pointer hover:bg-slate-200 transition-colors">Today</span>
+<span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-medium cursor-pointer hover:bg-slate-200 transition-colors">Campaign: API Growth</span>
+<span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-medium cursor-pointer hover:bg-slate-200 transition-colors">Sarah Jenkins</span>
+</div>
+<button class="text-primary text-xs font-semibold hover:underline">Clear all filters</button>
+</div>
+<!-- Data Table Card -->
+<div class="bg-white rounded-lg border border-[#248f4d]/20 shadow-sm overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-slate-50/50 border-b border-slate-100">
+<tr>
+<th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Contact</th>
+<th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Campaign</th>
+<th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Template</th>
+<th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Scheduled</th>
+<th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Sent</th>
+<th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+<th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100">
+<!-- Row 1 -->
+<tr class="hover:bg-slate-50/50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold">SJ</div>
+<a class="text-sm font-semibold text-primary hover:underline" href="#">Sarah Jenkins</a>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">Enterprise SaaS</td>
+<td class="px-6 py-4 text-sm text-slate-500">Q1 Outreach</td>
+<td class="px-6 py-4 text-sm text-slate-500">10:00 AM</td>
+<td class="px-6 py-4 text-sm text-slate-500">-</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-full text-[11px] font-bold uppercase tracking-tight">Pending</span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 border border-slate-300 text-slate-500 rounded hover:bg-slate-50 transition-colors" title="Send now">
+<span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+<button class="p-1.5 text-slate-400 hover:text-rose-500 transition-colors" title="Cancel">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-slate-50/50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold">MC</div>
+<a class="text-sm font-semibold text-primary hover:underline" href="#">Marcus Chen</a>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">API Growth</td>
+<td class="px-6 py-4 text-sm text-slate-500">Initial Touch</td>
+<td class="px-6 py-4 text-sm text-slate-500">9:15 AM</td>
+<td class="px-6 py-4 text-sm text-slate-500">9:16 AM</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-full text-[11px] font-bold uppercase tracking-tight">Sent</span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 border border-slate-300 text-slate-500 rounded hover:bg-slate-50 transition-colors">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-slate-50/50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-xs font-bold">ER</div>
+<a class="text-sm font-semibold text-primary hover:underline" href="#">Elena Rodriguez</a>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">Consulting</td>
+<td class="px-6 py-4 text-sm text-slate-500">Follow-up</td>
+<td class="px-6 py-4 text-sm text-slate-500">11:30 AM</td>
+<td class="px-6 py-4 text-sm text-slate-500">-</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-1 bg-amber-100 text-amber-700 rounded-full text-[11px] font-bold uppercase tracking-tight">Sending</span>
+<span class="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span>
+</div>
+</td>
+<td class="px-6 py-4 text-right"></td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-slate-50/50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-bold">DC</div>
+<a class="text-sm font-semibold text-primary hover:underline" href="#">David Chen</a>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">Infrastructure</td>
+<td class="px-6 py-4 text-sm text-slate-500">Demo Request</td>
+<td class="px-6 py-4 text-sm text-slate-500">8:00 AM</td>
+<td class="px-6 py-4 text-sm text-slate-500">8:02 AM</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 bg-rose-100 text-rose-700 rounded-full text-[11px] font-bold uppercase tracking-tight">Failed</span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="p-1.5 bg-rose-50 text-rose-600 rounded hover:bg-rose-100 transition-colors flex items-center gap-1" title="Retry">
+<span class="material-symbols-outlined text-[18px]">replay</span>
+<span class="text-[10px] font-bold">RETRY</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-slate-50/50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold">SJ</div>
+<a class="text-sm font-semibold text-primary hover:underline" href="#">Sarah Jenkins</a>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">API Growth</td>
+<td class="px-6 py-4 text-sm text-slate-500">Re-engagement</td>
+<td class="px-6 py-4 text-sm text-slate-500">2:00 PM</td>
+<td class="px-6 py-4 text-sm text-slate-500">-</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-full text-[11px] font-bold uppercase tracking-tight">Pending</span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 border border-slate-300 text-slate-500 rounded hover:bg-slate-50 transition-colors" title="Send now">
+<span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+<button class="p-1.5 text-slate-400 hover:text-rose-500 transition-colors" title="Cancel">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 6 -->
+<tr class="hover:bg-slate-50/50 transition-colors group border-b-0">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold">MC</div>
+<a class="text-sm font-semibold text-primary hover:underline" href="#">Marcus Chen</a>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">Consulting</td>
+<td class="px-6 py-4 text-sm text-slate-500">Partnership</td>
+<td class="px-6 py-4 text-sm text-slate-500">3:45 PM</td>
+<td class="px-6 py-4 text-sm text-slate-500">-</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-full text-[11px] font-bold uppercase tracking-tight">Pending</span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 border border-slate-300 text-slate-500 rounded hover:bg-slate-50 transition-colors" title="Send now">
+<span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+<button class="p-1.5 text-slate-400 hover:text-rose-500 transition-colors" title="Cancel">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Mockup -->
+<div class="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
+<span class="text-xs text-slate-500">Showing 6 of 42 scheduled tasks</span>
+<div class="flex items-center gap-2">
+<button class="p-1 text-slate-400 hover:text-primary transition-colors disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<div class="flex items-center gap-1">
+<button class="w-6 h-6 bg-primary text-white rounded text-[10px] font-bold">1</button>
+<button class="w-6 h-6 hover:bg-slate-200 text-slate-600 rounded text-[10px] font-bold">2</button>
+<button class="w-6 h-6 hover:bg-slate-200 text-slate-600 rounded text-[10px] font-bold">3</button>
+</div>
+<button class="p-1 text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Floating Atmospheric Element (Micro-interaction indicator) -->
+<div class="fixed bottom-6 right-6 bg-sidebar text-white px-4 py-3 rounded-lg shadow-2xl flex items-center gap-3 translate-y-20 opacity-0 transition-all duration-500" id="status-toast">
+<div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+<p class="text-sm font-medium">Syncing with mail server...</p>
+</div>
+</main>
+<script>
+        // Simple micro-interaction for simulation
+        document.addEventListener('DOMContentLoaded', () => {
+            const toast = document.getElementById('status-toast');
+            
+            // Show toast briefly every 30 seconds to simulate background activity
+            const showToast = () => {
+                toast.classList.remove('translate-y-20', 'opacity-0');
+                setTimeout(() => {
+                    toast.classList.add('translate-y-20', 'opacity-0');
+                }, 4000);
+            };
+
+            // Initial delay
+            setTimeout(showToast, 2000);
+            setInterval(showToast, 30000);
+        });
+    </script>
+</body></html>

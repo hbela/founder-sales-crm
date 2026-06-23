@@ -1,0 +1,3 @@
+[mcp_servers.stitch]
+command = "npx.cmd"
+args = ["-y", "@_davideast/stitch-mcp", "proxy"]

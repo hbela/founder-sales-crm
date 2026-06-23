@@ -30,3 +30,6 @@ Thumbs.db
 # misc
 coverage
 .cache
+
+# mcp config (contains API keys)
+.mcp.json

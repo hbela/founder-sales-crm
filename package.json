@@ -20,7 +20,15 @@
     "video:voice": "pnpm --filter @founder-crm/video-generator video:voice",
     "video:render": "pnpm --filter @founder-crm/video-generator video:render",
     "video:studio": "pnpm --filter @founder-crm/video-generator video:studio",
-    "video:browsers": "pnpm --filter @founder-crm/video-generator video:browsers"
+    "video:browsers": "pnpm --filter @founder-crm/video-generator video:browsers",
+    "new-video": "pnpm --filter @founder-crm/new-video video",
+    "new-video:script": "pnpm --filter @founder-crm/new-video video:script",
+    "new-video:scenes": "pnpm --filter @founder-crm/new-video video:scenes",
+    "new-video:screens": "pnpm --filter @founder-crm/new-video video:screens",
+    "new-video:voice": "pnpm --filter @founder-crm/new-video video:voice",
+    "new-video:render": "pnpm --filter @founder-crm/new-video video:render",
+    "new-video:studio": "pnpm --filter @founder-crm/new-video video:studio",
+    "new-video:browsers": "pnpm --filter @founder-crm/new-video video:browsers"
   },
   "packageManager": "pnpm@10.32.1",
   "engines": {

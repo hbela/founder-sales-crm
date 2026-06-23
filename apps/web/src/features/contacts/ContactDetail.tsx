@@ -2,8 +2,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowLeft, Pencil, Plus, Send, Mail } from "lucide-react";
-import { PageHeader } from "@/components/PageHeader";
+import { ArrowLeft, Pencil, Plus, Send, Mail, RefreshCw, CalendarCheck, MessageSquare, UserPlus, StickyNote, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -19,7 +18,18 @@ import { ContactForm } from "./ContactForm";
 import { useContact, useCampaigns, useTemplates } from "@/lib/hooks";
 import { api, ApiError } from "@/lib/api";
 import { CONTACT_STATUSES, type ContactStatus } from "@founder-crm/types";
-import { formatDateTime, formatDate } from "@/lib/utils";
+import { formatDateTime, formatDate, getInitials } from "@/lib/utils";
+
+function activityIcon(type: string): React.ElementType {
+  const t = type.toLowerCase();
+  if (t.includes("email") || t.includes("sent")) return Mail;
+  if (t.includes("outreach") || t.includes("linkedin") || t.includes("reply")) return MessageSquare;
+  if (t.includes("status")) return RefreshCw;
+  if (t.includes("meeting")) return CalendarCheck;
+  if (t.includes("note")) return StickyNote;
+  if (t.includes("created") || t.includes("contact")) return UserPlus;
+  return Activity;
+}
 
 export function ContactDetail() {
   const id = useParams({ strict: false }).id ?? "";
@@ -129,27 +139,32 @@ export function ContactDetail() {
         <ArrowLeft className="h-4 w-4" /> Back to contacts
       </Button>
 
-      <PageHeader
-        title={`${contact.firstName} ${contact.lastName}`}
-        description={contact.company ?? contact.email}
-        action={
-          <div className="flex items-center gap-2">
-            <Select value={contact.status} onValueChange={(v) => changeStatus(v as ContactStatus)}>
-              <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {CONTACT_STATUSES.map((s) => <SelectItem key={s} value={s}>{s.replace(/_/g, " ")}</SelectItem>)}
-              </SelectContent>
-            </Select>
-            <Button variant="outline" onClick={() => setEditOpen(true)}><Pencil className="h-4 w-4" /> Edit</Button>
-            <Button onClick={() => setOutreachOpen(true)}><Send className="h-4 w-4" /> Compose</Button>
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-4">
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary/10 text-lg font-semibold text-primary">
+            {getInitials(contact.firstName, contact.lastName)}
+          </span>
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">{contact.firstName} {contact.lastName}</h1>
+            <p className="text-sm text-muted-foreground">{contact.company ?? contact.email}</p>
           </div>
-        }
-      />
+        </div>
+        <div className="flex items-center gap-2">
+          <Select value={contact.status} onValueChange={(v) => changeStatus(v as ContactStatus)}>
+            <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {CONTACT_STATUSES.map((s) => <SelectItem key={s} value={s}>{s.replace(/_/g, " ")}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Button variant="outline" onClick={() => setEditOpen(true)}><Pencil className="h-4 w-4" /> Edit</Button>
+          <Button onClick={() => setOutreachOpen(true)}><Send className="h-4 w-4" /> Compose</Button>
+        </div>
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-1">
-          <CardHeader><CardTitle className="text-base">Details</CardTitle></CardHeader>
-          <CardContent className="space-y-3 text-sm">
+          <CardHeader><CardTitle className="text-base">Contact Details</CardTitle></CardHeader>
+          <CardContent className="space-y-4 text-sm">
             <Detail label="Status"><ContactStatusBadge status={contact.status} /></Detail>
             <Detail label="Email"><a href={`mailto:${contact.email}`} className="text-primary hover:underline">{contact.email}</a></Detail>
             <Detail label="Phone">{contact.phone ?? "—"}</Detail>
@@ -161,8 +176,8 @@ export function ContactDetail() {
               <>
                 <Separator />
                 <div>
-                  <p className="mb-1 text-xs text-muted-foreground">Notes</p>
-                  <p className="whitespace-pre-wrap">{contact.notes}</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Notes</p>
+                  <p className="mt-1 whitespace-pre-wrap">{contact.notes}</p>
                 </div>
               </>
             )}
@@ -181,16 +196,29 @@ export function ContactDetail() {
             <TabsContent value="activity">
               <Card>
                 <CardContent className="p-4">
-                  <ol className="relative space-y-4 border-l pl-4">
-                    {contact.activities.length === 0 && <p className="text-sm text-muted-foreground">No activity yet.</p>}
-                    {contact.activities.map((a) => (
-                      <li key={a.id} className="ml-2">
-                        <p className="text-sm font-medium capitalize">{a.type.replace(/_/g, " ").toLowerCase()}</p>
-                        <p className="text-sm text-muted-foreground">{a.description}</p>
-                        <p className="text-xs text-muted-foreground">{formatDateTime(a.createdAt)}</p>
-                      </li>
-                    ))}
-                  </ol>
+                  {contact.activities.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No activity yet.</p>
+                  ) : (
+                    <ol className="space-y-5">
+                      {contact.activities.map((a) => {
+                        const Icon = activityIcon(a.type);
+                        return (
+                          <li key={a.id} className="flex gap-3">
+                            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                              <Icon className="h-4 w-4" />
+                            </span>
+                            <div className="flex-1">
+                              <div className="flex items-start justify-between gap-2">
+                                <p className="text-sm font-semibold capitalize">{a.type.replace(/_/g, " ").toLowerCase()}</p>
+                                <span className="shrink-0 text-xs text-muted-foreground">{formatDateTime(a.createdAt)}</span>
+                              </div>
+                              <p className="text-sm text-muted-foreground">{a.description}</p>
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ol>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -309,9 +337,9 @@ export function ContactDetail() {
 
 function Detail({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex justify-between gap-4">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="text-right">{children}</span>
+    <div>
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
+      <div className="mt-0.5 break-words">{children}</div>
     </div>
   );
 }
