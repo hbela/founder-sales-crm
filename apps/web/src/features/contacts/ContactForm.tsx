@@ -23,6 +23,7 @@ const EMPTY = {
   firstName: "",
   lastName: "",
   company: "",
+  empNumber: "",
   email: "",
   phone: "",
   website: "",
@@ -45,6 +46,7 @@ export function ContactForm({ open, onOpenChange, contact, onSaved }: Props) {
         firstName: contact.firstName,
         lastName: contact.lastName,
         company: contact.company ?? "",
+        empNumber: contact.empNumber?.toString() ?? "",
         email: contact.email,
         phone: contact.phone ?? "",
         website: contact.website ?? "",
@@ -67,7 +69,11 @@ export function ContactForm({ open, onOpenChange, contact, onSaved }: Props) {
     e.preventDefault();
     setLoading(true);
     try {
-      const payload = { ...form, productId: form.productId || undefined };
+      const payload = {
+        ...form,
+        empNumber: form.empNumber ? Number(form.empNumber) : undefined,
+        productId: form.productId || undefined,
+      };
       if (contact) {
         await api.patch(`/api/contacts/${contact.id}`, payload);
         toast.success("Contact updated");
@@ -106,6 +112,10 @@ export function ContactForm({ open, onOpenChange, contact, onSaved }: Props) {
             <div className="space-y-2">
               <Label htmlFor="company">Company</Label>
               <Input id="company" placeholder="Global Tech Corp" value={form.company} onChange={(e) => set("company", e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="empNumber">Employees</Label>
+              <Input id="empNumber" type="number" min={0} placeholder="e.g. 25" value={form.empNumber} onChange={(e) => set("empNumber", e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email *</Label>

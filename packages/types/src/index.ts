@@ -73,6 +73,10 @@ export const contactCreateSchema = z.object({
   firstName: z.string().trim().min(1).max(120),
   lastName: z.string().trim().min(1).max(120),
   company: optionalString,
+  empNumber: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? undefined : v),
+    z.coerce.number().int().min(0).max(10_000_000).optional(),
+  ),
   email: z.string().trim().toLowerCase().email(),
   phone: optionalString,
   website: optionalString,
@@ -85,6 +89,27 @@ export const contactCreateSchema = z.object({
 export type ContactCreate = z.infer<typeof contactCreateSchema>;
 export const contactUpdateSchema = contactCreateSchema.partial();
 export type ContactUpdate = z.infer<typeof contactUpdateSchema>;
+
+/* Contact CSV import */
+export const contactImportRowSchema = contactCreateSchema.pick({
+  firstName: true,
+  lastName: true,
+  company: true,
+  empNumber: true,
+  email: true,
+  phone: true,
+  website: true,
+  industry: true,
+  country: true,
+  notes: true,
+});
+export type ContactImportRow = z.infer<typeof contactImportRowSchema>;
+
+export const contactImportSchema = z.object({
+  rows: z.array(z.record(z.string(), z.unknown())).min(1).max(2000),
+  productId: z.string().cuid().optional(),
+});
+export type ContactImport = z.infer<typeof contactImportSchema>;
 
 export const contactSearchSchema = z.object({
   q: z.string().optional(),

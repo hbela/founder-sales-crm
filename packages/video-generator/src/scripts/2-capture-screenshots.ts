@@ -24,7 +24,9 @@ const scenes = scenesSchema.parse(JSON.parse(await fs.readFile(SCENES_PATH, "utf
 await fs.mkdir(SCREENSHOTS_DIR, { recursive: true });
 
 const browser = await chromium.launch();
-const page = await browser.newPage({ viewport: { width, height } });
+// deviceScaleFactor: 2 captures at 2× resolution (e.g. 3840×2160 for a 1920×1080
+// viewport) so screenshots stay crisp when scaled/zoomed in the 1080p render.
+const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: 2 });
 
 try {
   if (LOGIN_EMAIL && LOGIN_PASSWORD) {

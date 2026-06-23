@@ -22,6 +22,7 @@ export type Contact = {
   firstName: string;
   lastName: string;
   company?: string | null;
+  empNumber?: number | null;
   email: string;
   phone?: string | null;
   website?: string | null;

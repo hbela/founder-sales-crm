@@ -83,6 +83,7 @@ model Contact {
   firstName String
   lastName  String
   company   String?
+  empNumber Int?
   email     String   @unique
   phone     String?
   website   String?

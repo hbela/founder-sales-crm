@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Plus, Search, Pencil } from "lucide-react";
+import { Plus, Search, Pencil, Upload } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ContactStatusBadge } from "@/components/StatusBadge";
 import { ContactForm } from "./ContactForm";
+import { ImportContactsDialog } from "./ImportContactsDialog";
 import { useContacts, useProducts, type Contact } from "@/lib/hooks";
 import { CONTACT_STATUSES, type ContactStatus } from "@founder-crm/types";
 import { formatDate, getInitials } from "@/lib/utils";
@@ -21,6 +22,7 @@ export function ContactsList() {
   const [productId, setProductId] = useState<string>("ALL");
   const [page, setPage] = useState(1);
   const [formOpen, setFormOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [editing, setEditing] = useState<Contact | null>(null);
 
   const { data: products } = useProducts();
@@ -47,7 +49,12 @@ export function ContactsList() {
       <PageHeader
         title="Contacts"
         description="Your single source of truth for prospects"
-        action={<Button onClick={newContact}><Plus className="h-4 w-4" /> New Contact</Button>}
+        action={
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setImportOpen(true)}><Upload className="h-4 w-4" /> Import CSV</Button>
+            <Button onClick={newContact}><Plus className="h-4 w-4" /> New Contact</Button>
+          </div>
+        }
       />
 
       <Card className="mb-4 p-4">
@@ -84,6 +91,7 @@ export function ContactsList() {
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Company</TableHead>
+              <TableHead>Employees</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Product</TableHead>
               <TableHead>Status</TableHead>
@@ -95,7 +103,7 @@ export function ContactsList() {
             {isLoading ? (
               Array.from({ length: 6 }).map((_, i) => (
                 <TableRow key={i}>
-                  <TableCell colSpan={7}><Skeleton className="h-6" /></TableCell>
+                  <TableCell colSpan={8}><Skeleton className="h-6" /></TableCell>
                 </TableRow>
               ))
             ) : data && data.items.length > 0 ? (
@@ -110,6 +118,7 @@ export function ContactsList() {
                     </div>
                   </TableCell>
                   <TableCell>{c.company ?? "—"}</TableCell>
+                  <TableCell>{c.empNumber ?? "—"}</TableCell>
                   <TableCell className="text-muted-foreground">{c.email}</TableCell>
                   <TableCell>{c.product?.name ?? "—"}</TableCell>
                   <TableCell><ContactStatusBadge status={c.status} /></TableCell>
@@ -127,7 +136,7 @@ export function ContactsList() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="py-10 text-center text-muted-foreground">
+                <TableCell colSpan={8} className="py-10 text-center text-muted-foreground">
                   No contacts found. <button className="text-primary underline" onClick={newContact}>Add your first contact</button>.
                 </TableCell>
               </TableRow>
@@ -149,6 +158,7 @@ export function ContactsList() {
       )}
 
       <ContactForm open={formOpen} onOpenChange={setFormOpen} contact={editing} />
+      <ImportContactsDialog open={importOpen} onOpenChange={setImportOpen} />
     </div>
   );
 }

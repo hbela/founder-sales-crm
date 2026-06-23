@@ -111,6 +111,9 @@ importers:
       lucide-react:
         specifier: ^0.454.0
         version: 0.454.0(react@19.2.7)
+      papaparse:
+        specifier: ^5.5.4
+        version: 5.5.4
       react:
         specifier: ^19.0.0
         version: 19.2.7
@@ -127,6 +130,9 @@ importers:
         specifier: ^3.23.8
         version: 3.25.76
     devDependencies:
+      '@types/papaparse':
+        specifier: ^5.5.2
+        version: 5.5.2
       '@types/react':
         specifier: ^19.0.0
         version: 19.2.17
@@ -192,7 +198,7 @@ importers:
     dependencies:
       '@remotion/bundler':
         specifier: ^4.0.0
-        version: 4.0.481(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 4.0.481(postcss@8.5.15)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@remotion/renderer':
         specifier: ^4.0.0
         version: 4.0.481(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -214,7 +220,7 @@ importers:
     devDependencies:
       '@remotion/cli':
         specifier: ^4.0.0
-        version: 4.0.481(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 4.0.481(postcss@8.5.15)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@types/node':
         specifier: ^22.9.0
         version: 22.19.21
@@ -251,7 +257,7 @@ importers:
     dependencies:
       '@remotion/bundler':
         specifier: ^4.0.0
-        version: 4.0.481(postcss@8.5.15)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 4.0.481(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@remotion/renderer':
         specifier: ^4.0.0
         version: 4.0.481(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -279,7 +285,7 @@ importers:
     devDependencies:
       '@remotion/cli':
         specifier: ^4.0.0
-        version: 4.0.481(postcss@8.5.15)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 4.0.481(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@types/node':
         specifier: ^22.9.0
         version: 22.19.21
@@ -1601,6 +1607,9 @@ packages:
   '@types/node@22.19.21':
     resolution: {integrity: sha512-VMeFBSCKQKmm2swI2kW51SFusDqekC6q9trBCvJ/JliDchFSuoYYKN7yVNjPthP1HKZcx3U1gI/wTcEBjEFKTA==}
 
+  '@types/papaparse@5.5.2':
+    resolution: {integrity: sha512-gFnFp/JMzLHCwRf7tQHrNnfhN4eYBVYYI897CGX4MY1tzY9l2aLkVyx2IlKZ/SAqDbB3I1AOZW5gTMGGsqWliA==}
+
   '@types/react-dom@19.2.3':
     resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
     peerDependencies:
@@ -2361,6 +2370,9 @@ packages:
         optional: true
       zod:
         optional: true
+
+  papaparse@5.5.4:
+    resolution: {integrity: sha512-SwzWD9gl/ElwYLCI0nUja1mFJzjq2D8ziShfNBa7zCHzkOozeOGDwHWQ+tvCzEZcewecWZ5U7kUopDnG+DFYEQ==}
 
   path-key@3.1.1:
     resolution: {integrity: sha512-ojmeN0qd+y0jszEtoY48r0Peq5dwMEkIlCOu6Q5f41lfkswXuKtYrhgoTpLnyIcHm24Uhqx+5Tqm2InSwLhE6Q==}
@@ -4336,6 +4348,10 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
+  '@types/papaparse@5.5.2':
+    dependencies:
+      '@types/node': 22.19.21
+
   '@types/react-dom@19.2.3(@types/react@19.2.17)':
     dependencies:
       '@types/react': 19.2.17
@@ -5108,6 +5124,8 @@ snapshots:
       zod: 4.3.6
     transitivePeerDependencies:
       - encoding
+
+  papaparse@5.5.4: {}
 
   path-key@3.1.1: {}
 
