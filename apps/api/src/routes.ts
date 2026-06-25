@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { authRoutes } from "./modules/auth/routes.js";
 import { productRoutes } from "./modules/products/routes.js";
 import { contactRoutes } from "./modules/contacts/routes.js";
+import { prospectingRoutes } from "./modules/prospecting/routes.js";
 import { campaignRoutes } from "./modules/campaigns/routes.js";
 import { templateRoutes } from "./modules/templates/routes.js";
 import { outreachRoutes } from "./modules/outreach/routes.js";
@@ -20,6 +21,7 @@ export async function registerRoutes(app: FastifyInstance): Promise<void> {
     protectedApp.addHook("preHandler", app.requireAuth);
     await protectedApp.register(productRoutes);
     await protectedApp.register(contactRoutes);
+    await protectedApp.register(prospectingRoutes);
     await protectedApp.register(campaignRoutes);
     await protectedApp.register(templateRoutes);
     await protectedApp.register(outreachRoutes);

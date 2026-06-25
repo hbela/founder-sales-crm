@@ -36,6 +36,21 @@ enum FollowUpStatus {
   COMPLETED
 }
 
+enum ProspectStatus {
+  NEW
+  ENRICHED
+  NEEDS_REVIEW
+  QUALIFIED
+  DISQUALIFIED
+  IMPORTED
+}
+
+enum ProspectSource {
+  GOOGLE_PLACES
+  CSV
+  MANUAL
+}
+
 enum ActivityType {
   CONTACT_CREATED
   CONTACT_UPDATED
@@ -89,8 +104,10 @@ model Contact {
   website   String?
   industry  String?
   country   String?
+  city      String?
   notes     String?
   status    ContactStatus @default(NEW)
+  unsubscribedAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -100,9 +117,65 @@ model Contact {
   outreach  Outreach[]
   followups FollowUp[]
   activities Activity[]
+  prospect  Prospect?
 
   @@index([status])
+  @@index([city])
   @@map("contacts")
+}
+
+// Permanent opt-out / bounce list. Keyed by email so it survives Contact deletion
+// and blocks re-import of an opted-out clinic from the Prospecting module.
+model Suppression {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  reason    String?  // "unsubscribe" | "bounce" | "manual"
+  createdAt DateTime @default(now())
+
+  @@map("suppressions")
+}
+
+model Prospect {
+  id               String   @id @default(cuid())
+  brandName        String
+  legalName        String?
+  website          String?
+  domain           String?
+  generalEmail     String?
+  phone            String?
+  address          String?
+  district         String?
+  city             String?
+  googlePlaceId    String?  @unique
+  rating           Float?
+  reviewCount      Int?
+  businessStatus   String?
+  dentistCount     Int?
+  locationCount    Int?
+  employeeCount    Int?
+  hasOnlineBooking Boolean  @default(false)
+  fitScore         Int?
+  status           ProspectStatus @default(NEW)
+  source           ProspectSource
+  notes            String?
+  enrichedAt       DateTime?
+
+  // Background enrichment queue (Phase 1)
+  enrichQueuedAt   DateTime?
+  enrichStartedAt  DateTime?
+  enrichAttempts   Int       @default(0)
+  enrichError      String?
+
+  importedContactId String?  @unique
+  importedContact   Contact? @relation(fields: [importedContactId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([district])
+  @@index([enrichQueuedAt])
+  @@map("prospects")
 }
 
 model Campaign {
@@ -110,6 +183,7 @@ model Campaign {
   name         String
   productId    String
   targetMarket String?
+  city         String?
   startDate    DateTime?
   endDate      DateTime?
   status       CampaignStatus @default(DRAFT)
@@ -120,6 +194,7 @@ model Campaign {
   outreach Outreach[]
 
   @@index([status])
+  @@index([city])
   @@map("campaigns")
 }
 

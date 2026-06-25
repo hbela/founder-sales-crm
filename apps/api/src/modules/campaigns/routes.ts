@@ -23,6 +23,7 @@ export async function campaignRoutes(app: FastifyInstance): Promise<void> {
       data: {
         ...data,
         targetMarket: data.targetMarket || null,
+        city: data.city || null,
         startDate: data.startDate ?? null,
         endDate: data.endDate ?? null,
       },
@@ -49,6 +50,7 @@ export async function campaignRoutes(app: FastifyInstance): Promise<void> {
       data: {
         ...data,
         ...(data.targetMarket !== undefined ? { targetMarket: data.targetMarket || null } : {}),
+        ...(data.city !== undefined ? { city: data.city || null } : {}),
         ...(data.startDate !== undefined ? { startDate: data.startDate ?? null } : {}),
         ...(data.endDate !== undefined ? { endDate: data.endDate ?? null } : {}),
       },

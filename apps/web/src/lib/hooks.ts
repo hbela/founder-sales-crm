@@ -5,6 +5,8 @@ import type {
   CampaignStatus,
   OutreachStatus,
   FollowUpStatus,
+  ProspectStatus,
+  ProspectSource,
 } from "@founder-crm/types";
 
 export type Product = {
@@ -28,10 +30,45 @@ export type Contact = {
   website?: string | null;
   industry?: string | null;
   country?: string | null;
+  city?: string | null;
   notes?: string | null;
   status: ContactStatus;
   productId?: string | null;
   product?: Product | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type Prospect = {
+  id: string;
+  brandName: string;
+  legalName?: string | null;
+  website?: string | null;
+  domain?: string | null;
+  generalEmail?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  district?: string | null;
+  city?: string | null;
+  googlePlaceId?: string | null;
+  rating?: number | null;
+  reviewCount?: number | null;
+  businessStatus?: string | null;
+  dentistCount?: number | null;
+  locationCount?: number | null;
+  employeeCount?: number | null;
+  hasOnlineBooking: boolean;
+  fitScore?: number | null;
+  status: ProspectStatus;
+  source: ProspectSource;
+  notes?: string | null;
+  enrichedAt?: string | null;
+  enrichQueuedAt?: string | null;
+  enrichStartedAt?: string | null;
+  enrichAttempts?: number;
+  enrichError?: string | null;
+  importedContactId?: string | null;
+  importedContact?: Contact | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -73,6 +110,7 @@ export type Campaign = {
   name: string;
   productId: string;
   targetMarket?: string | null;
+  city?: string | null;
   startDate?: string | null;
   endDate?: string | null;
   status: CampaignStatus;
@@ -132,6 +170,44 @@ export function useContact(id: string) {
     queryKey: ["contact", id],
     queryFn: () =>
       api.get<Contact & { activities: Activity[]; followups: FollowUp[]; outreach: Outreach[] }>(`/api/contacts/${id}`),
+    enabled: !!id,
+  });
+}
+
+export function useProspects(params: {
+  q?: string;
+  status?: ProspectStatus;
+  district?: string;
+  city?: string;
+  hasWebsite?: boolean;
+  hasEmail?: boolean;
+  page?: number;
+}) {
+  const qs = new URLSearchParams();
+  if (params.q) qs.set("q", params.q);
+  if (params.status) qs.set("status", params.status);
+  if (params.district) qs.set("district", params.district);
+  if (params.city) qs.set("city", params.city);
+  if (params.hasWebsite) qs.set("hasWebsite", "true");
+  if (params.hasEmail) qs.set("hasEmail", "true");
+  qs.set("page", String(params.page ?? 1));
+  return useQuery({
+    queryKey: ["prospects", params.q, params.status, params.district, params.city, params.hasWebsite, params.hasEmail, params.page ?? 1],
+    queryFn: () => api.get<Paginated<Prospect>>(`/api/prospects?${qs.toString()}`),
+    // Poll while any prospect is still in the enrichment queue.
+    refetchInterval: (query) =>
+      query.state.data?.items.some((p) => p.enrichQueuedAt) ? 4000 : false,
+  });
+}
+
+export function useProspectCities() {
+  return useQuery({ queryKey: ["prospect-cities"], queryFn: () => api.get<string[]>("/api/prospects/cities") });
+}
+
+export function useProspect(id: string) {
+  return useQuery({
+    queryKey: ["prospect", id],
+    queryFn: () => api.get<Prospect>(`/api/prospects/${id}`),
     enabled: !!id,
   });
 }

@@ -10,6 +10,8 @@ import { Login } from "@/features/auth/Login";
 import { Dashboard } from "@/features/dashboard/Dashboard";
 import { ContactsList } from "@/features/contacts/ContactsList";
 import { ContactDetail } from "@/features/contacts/ContactDetail";
+import { ProspectingList } from "@/features/prospecting/ProspectingList";
+import { ProspectDetail } from "@/features/prospecting/ProspectDetail";
 import { Pipeline } from "@/features/pipeline/Pipeline";
 import { Campaigns } from "@/features/campaigns/Campaigns";
 import { Templates } from "@/features/templates/Templates";
@@ -59,6 +61,18 @@ const contactDetailRoute = createRoute({
   component: ContactDetail,
 });
 
+const prospectingRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: "/prospecting",
+  component: ProspectingList,
+});
+
+const prospectDetailRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: "/prospecting/$id",
+  component: ProspectDetail,
+});
+
 const pipelineRoute = createRoute({
   getParentRoute: () => protectedRoute,
   path: "/pipeline",
@@ -102,6 +116,8 @@ const routeTree = rootRoute.addChildren([
     dashboardRoute,
     contactsRoute,
     contactDetailRoute,
+    prospectingRoute,
+    prospectDetailRoute,
     pipelineRoute,
     campaignsRoute,
     templatesRoute,

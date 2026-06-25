@@ -62,5 +62,15 @@ export function htmlEscape(str: string): string {
 }
 
 export function bodyToHtml(body: string): string {
-  return `<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.5;white-space:pre-wrap;">${htmlEscape(body)}</div>`;
+  return `<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.5;white-space:pre-wrap;">${htmlEscape(body)}</div>${unsubscribeFooter()}`;
+}
+
+/**
+ * Plain opt-out footer appended to every outgoing email. Reply-based so it needs
+ * no public endpoint: n8n's inbox watcher flags "unsubscribe" replies and calls
+ * POST /api/webhooks/unsubscribe. Required for cold-outreach compliance.
+ */
+function unsubscribeFooter(): string {
+  const replyTo = env.replyToEmail || env.resendFromEmail;
+  return `<div style="font-family:Arial,sans-serif;font-size:12px;color:#888;margin-top:24px;border-top:1px solid #eee;padding-top:8px;">Don't want to hear from us? Reply with the word <strong>UNSUBSCRIBE</strong> and we'll remove you${replyTo ? ` (${htmlEscape(replyTo)})` : ""}.</div>`;
 }

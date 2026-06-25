@@ -27,7 +27,17 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const data = text ? JSON.parse(text) : undefined;
 
   if (!res.ok) {
-    const message = (data && (data.error || data.message)) || res.statusText;
+    let message = (data && (data.error || data.message)) || res.statusText;
+    // Surface zod validation details so "Validation failed" is actionable.
+    if (Array.isArray(data?.issues) && data.issues.length) {
+      const detail = data.issues
+        .map((i: { path?: (string | number)[]; message?: string }) =>
+          `${i.path?.length ? `${i.path.join(".")}: ` : ""}${i.message ?? ""}`,
+        )
+        .filter(Boolean)
+        .join("; ");
+      if (detail) message = `${message} — ${detail}`;
+    }
     throw new ApiError(message, res.status, data);
   }
 

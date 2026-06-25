@@ -2,6 +2,7 @@ import type { PrismaClient } from "@founder-crm/db";
 import { sendEmail, bodyToHtml } from "./email.js";
 import { renderTemplate } from "./template.js";
 import { logActivity } from "./activity.js";
+import { env } from "../env.js";
 
 export async function processOutreachItem(
   prisma: PrismaClient,
@@ -15,13 +16,37 @@ export async function processOutreachItem(
   if (!item) return { success: false, error: "Outreach item not found" };
   if (item.status === "SENT") return { success: true };
 
+  // Suppression guard: never send to an unsubscribed contact or a suppressed email.
+  const suppressed =
+    item.contact.unsubscribedAt != null ||
+    (await prisma.suppression.findUnique({ where: { email: item.contact.email } })) != null;
+  if (suppressed) {
+    await prisma.outreach.update({
+      where: { id: itemId },
+      data: { status: "FAILED", errorMessage: "Suppressed: recipient unsubscribed or bounced", sentAt: null },
+    });
+    await logActivity(prisma, {
+      contactId: item.contactId,
+      type: "NOTE_ADDED",
+      description: "Send skipped — recipient is on the suppression list",
+    });
+    return { success: false, error: "suppressed" };
+  }
+
   await prisma.outreach.update({ where: { id: itemId }, data: { status: "SENDING" } });
 
   const product = item.template.product ?? item.contact.product;
   const subject = renderTemplate(item.template.subject, { contact: item.contact, product });
   const body = renderTemplate(item.template.body, { contact: item.contact, product });
 
-  const result = await sendEmail({ to: item.contact.email, subject, html: bodyToHtml(body) });
+  const result = await sendEmail({
+    to: item.contact.email,
+    subject,
+    html: bodyToHtml(body),
+    // Thread replies into the Workspace mailbox that n8n watches (falls back to
+    // Resend's From address when REPLY_TO_EMAIL is unset).
+    replyTo: env.replyToEmail || undefined,
+  });
 
   if (!result.success) {
     await prisma.outreach.update({

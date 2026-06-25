@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import type { ContactStatus, CampaignStatus, OutreachStatus, FollowUpStatus } from "@founder-crm/types";
+import type { ContactStatus, CampaignStatus, OutreachStatus, FollowUpStatus, ProspectStatus } from "@founder-crm/types";
 
 const CONTACT_STATUS_STYLE: Record<ContactStatus, { variant: "default" | "secondary" | "success" | "warning" | "destructive" | "outline"; label: string }> = {
   NEW: { variant: "secondary", label: "New" },
@@ -42,4 +42,18 @@ export function OutreachStatusBadge({ status }: { status: OutreachStatus }) {
 
 export function FollowupStatusBadge({ status }: { status: FollowUpStatus }) {
   return <Badge variant={status === "COMPLETED" ? "success" : "warning"}>{status === "COMPLETED" ? "Done" : "Pending"}</Badge>;
+}
+
+const PROSPECT_STATUS_STYLE: Record<ProspectStatus, { variant: "default" | "secondary" | "success" | "warning" | "destructive" | "outline"; label: string }> = {
+  NEW: { variant: "secondary", label: "New" },
+  ENRICHED: { variant: "outline", label: "Enriched" },
+  NEEDS_REVIEW: { variant: "warning", label: "Needs review" },
+  QUALIFIED: { variant: "default", label: "Qualified" },
+  DISQUALIFIED: { variant: "destructive", label: "Disqualified" },
+  IMPORTED: { variant: "success", label: "Imported" },
+};
+
+export function ProspectStatusBadge({ status }: { status: ProspectStatus }) {
+  const s = PROSPECT_STATUS_STYLE[status];
+  return <Badge variant={s.variant}>{s.label}</Badge>;
 }

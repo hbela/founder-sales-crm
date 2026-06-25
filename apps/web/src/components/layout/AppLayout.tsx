@@ -3,6 +3,7 @@ import { Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-route
 import {
   LayoutDashboard,
   Users,
+  Target,
   KanbanSquare,
   Megaphone,
   Mail,
@@ -20,6 +21,7 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/contacts", label: "Contacts", icon: Users },
+  { to: "/prospecting", label: "Prospecting", icon: Target },
   { to: "/pipeline", label: "Pipeline", icon: KanbanSquare },
   { to: "/campaigns", label: "Campaigns", icon: Megaphone },
   { to: "/templates", label: "Templates", icon: Mail },

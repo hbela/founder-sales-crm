@@ -114,50 +114,6 @@ Founder`,
     },
   });
 
-  const sampleContacts = [
-    {
-      firstName: "Anna",
-      lastName: "Kovacs",
-      company: "Budapest Smile Clinic",
-      email: "anna@budapestsmile.hu",
-      country: "Hungary",
-      industry: "Dental",
-      website: "https://budapestsmile.hu",
-      productId: sunshine.id,
-      status: "NEW" as const,
-    },
-    {
-      firstName: "Peter",
-      lastName: "Nagy",
-      company: "Debrecen Dental",
-      email: "peter@debrecendental.hu",
-      country: "Hungary",
-      industry: "Dental",
-      website: "https://debrecendental.hu",
-      productId: sunshine.id,
-      status: "CONTACTED" as const,
-    },
-    {
-      firstName: "Maria",
-      lastName: "Szabo",
-      company: "Szeged Finance Advisory",
-      email: "maria@szegedfinance.hu",
-      country: "Hungary",
-      industry: "Finance",
-      website: "https://szegedfinance.hu",
-      productId: finance.id,
-      status: "REPLIED" as const,
-    },
-  ];
-
-  for (const c of sampleContacts) {
-    await prisma.contact.upsert({
-      where: { email: c.email },
-      update: {},
-      create: c,
-    });
-  }
-
   console.log("Seed complete.");
 }
 

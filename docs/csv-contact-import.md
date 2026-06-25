@@ -123,10 +123,9 @@ dental clinic rows in the template columns, with varied `empNumber` values and p
 `.hu` emails that won't collide with the three seeded sample contacts. This is the file the
 user imports to test, and the template they replace with real data.
 
-> **Sourcing real clinic data later** (out of scope here): Google Places/Maps API gives
-> name/address/phone/website but no email or headcount; a scraper against a business
-> directory yields more but is messy/ToS-sensitive; a B2B data provider (Apollo, Cognism)
-> gives email + employee count directly — the cleanest source for real `empNumber` data.
+> **Sourcing real clinic data later** (out of scope here): the Prospecting module uses the
+> Google Places API for name/address/phone/website, then extracts email and staff/capacity
+> signals from each clinic's own website (GLM enrichment). No paid B2B data providers are used.
 
 ---
 

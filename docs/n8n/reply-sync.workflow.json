@@ -1,0 +1,185 @@
+{
+  "name": "Founder CRM — Gmail Reply Sync",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": true,
+        "filters": {
+          "labelIds": ["INBOX"]
+        },
+        "options": {}
+      },
+      "id": "b1a1c2d3-0001-4000-8000-000000000001",
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [-160, 240],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "Gmail account (Workspace mailbox)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ── EDIT THESE TWO LINES ───────────────────────────────────────────────\nconst CRM_API_BASE_URL = 'https://YOUR-CRM-API.example.com'; // public URL of the CRM API\nconst WEBHOOK_SECRET   = 'CHANGE_ME';                        // must equal N8N_WEBHOOK_SECRET in the CRM .env\n// ───────────────────────────────────────────────────────────────────────\n// Runs once for ALL items: a single Gmail poll can surface several new messages,\n// so iterate over every incoming item rather than only the first item.\n\nfunction header(item, name) {\n  const headers = item.payload?.headers || item.headers || [];\n  if (Array.isArray(headers)) {\n    const h = headers.find((x) => (x.name || '').toLowerCase() === name.toLowerCase());\n    return h?.value || '';\n  }\n  if (headers && typeof headers === 'object') {\n    return headers[name] || headers[name.toLowerCase()] || '';\n  }\n  return '';\n}\n\nconst out = [];\nfor (const entry of $input.all()) {\n  const item = entry.json;\n\n  const rawFrom    = item.from || item.From || header(item, 'From') || '';\n  const subject    = item.subject || item.Subject || header(item, 'Subject') || item.snippet || '';\n  const receivedAt = item.date || item.internalDate || new Date().toISOString();\n\n  // Extract the bare address from \"Display Name <user@domain.com>\".\n  const match = String(rawFrom).match(/<([^>]+)>/);\n  const email = (match ? match[1] : String(rawFrom)).trim().toLowerCase();\n  if (!email) continue; // no sender address — skip this message\n\n  // Detect opt-out intent (English + Hungarian) from subject + snippet.\n  const haystack = `${subject} ${item.snippet || ''}`.toLowerCase();\n  const isUnsubscribe = /(unsubscribe|opt[\\s-]?out|leiratkoz|\\bstop\\b)/.test(haystack);\n\n  out.push({\n    json: { email, subject, receivedAt, isUnsubscribe, apiBaseUrl: CRM_API_BASE_URL, webhookSecret: WEBHOOK_SECRET },\n  });\n}\n\nreturn out;\n"
+      },
+      "id": "b1a1c2d3-0002-4000-8000-000000000002",
+      "name": "Extract Reply",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [80, 240]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "cond-unsub-001",
+              "leftValue": "={{ $json.isUnsubscribe }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b1a1c2d3-0003-4000-8000-000000000003",
+      "name": "Is Unsubscribe?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [320, 240]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.apiBaseUrl }}/api/webhooks/unsubscribe",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-webhook-secret",
+              "value": "={{ $json.webhookSecret }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ email: $json.email }) }}",
+        "options": {}
+      },
+      "id": "b1a1c2d3-0004-4000-8000-000000000004",
+      "name": "POST /webhooks/unsubscribe",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [600, 120],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.apiBaseUrl }}/api/webhooks/reply",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-webhook-secret",
+              "value": "={{ $json.webhookSecret }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ email: $json.email, subject: $json.subject, receivedAt: $json.receivedAt }) }}",
+        "options": {}
+      },
+      "id": "b1a1c2d3-0005-4000-8000-000000000005",
+      "name": "POST /webhooks/reply",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [600, 360],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "content": "## Gmail Reply Sync\n\nWatches the Workspace inbox and tells the CRM when a prospect replies or asks to opt out.\n\n**Before activating:**\n1. Open **Extract Reply** and set `CRM_API_BASE_URL` + `WEBHOOK_SECRET` (the secret must match `N8N_WEBHOOK_SECRET` in the CRM `.env`).\n2. Attach your Gmail (Workspace) OAuth2 credential to **Gmail Trigger**.\n3. (Optional) Narrow the trigger to a Gmail label instead of all of INBOX.\n\nReplies → `POST /api/webhooks/reply` (contact → REPLIED).\nOpt-outs → `POST /api/webhooks/unsubscribe` (suppressed).",
+        "height": 320,
+        "width": 360
+      },
+      "id": "b1a1c2d3-0006-4000-8000-000000000006",
+      "name": "Setup Notes",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-160, -120]
+    }
+  ],
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Extract Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Reply": {
+      "main": [
+        [
+          {
+            "node": "Is Unsubscribe?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Unsubscribe?": {
+      "main": [
+        [
+          {
+            "node": "POST /webhooks/unsubscribe",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "POST /webhooks/reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "pinData": {}
+}
