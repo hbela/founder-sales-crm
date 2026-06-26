@@ -2,6 +2,7 @@
 /** @jsxImportSource react */
 import type { ReactElement } from "react";
 import LaunchCampaign from "../emails/LaunchCampaign.js";
+import SunshineOffer1 from "../emails/SunshineOffer1.js";
 
 /**
  * Registry of sendable campaigns, keyed by a stable slug. The same components
@@ -10,6 +11,7 @@ import LaunchCampaign from "../emails/LaunchCampaign.js";
  */
 export const campaigns: Record<string, () => ReactElement> = {
   launch: () => <LaunchCampaign />,
+  "sunshine-offer1": () => <SunshineOffer1 />,
 };
 
 export type CampaignKey = keyof typeof campaigns;
