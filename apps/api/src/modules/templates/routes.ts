@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { templateCreateSchema, templateUpdateSchema, templatePreviewSchema } from "@founder-crm/types";
 import { renderTemplate } from "../../lib/template.js";
+import { bodyToHtml } from "../../lib/email.js";
 
 export async function templateRoutes(app: FastifyInstance): Promise<void> {
   app.get("/api/templates", async (request) => {
@@ -59,9 +60,13 @@ export async function templateRoutes(app: FastifyInstance): Promise<void> {
     if (!contact) return reply.code(404).send({ error: "Contact not found" });
 
     const product = template.product ?? contact.product;
+    const subject = renderTemplate(template.subject, { contact, product });
+    const body = renderTemplate(template.body, { contact, product });
     return {
-      subject: renderTemplate(template.subject, { contact, product }),
-      body: renderTemplate(template.body, { contact, product }),
+      subject,
+      body,
+      // Fully rendered branded email so the UI can show what the recipient sees.
+      html: await bodyToHtml(body, { previewText: subject }),
     };
   });
 }

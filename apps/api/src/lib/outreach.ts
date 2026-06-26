@@ -42,7 +42,7 @@ export async function processOutreachItem(
   const result = await sendEmail({
     to: item.contact.email,
     subject,
-    html: bodyToHtml(body),
+    html: await bodyToHtml(body, { previewText: subject }),
     // Thread replies into the Workspace mailbox that n8n watches (falls back to
     // Resend's From address when REPLY_TO_EMAIL is unset).
     replyTo: env.replyToEmail || undefined,

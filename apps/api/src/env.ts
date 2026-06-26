@@ -24,6 +24,11 @@ export const env = {
   resendApiKey: process.env.RESEND_API_KEY ?? "",
   resendFromEmail: process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev",
   replyToEmail: process.env.REPLY_TO_EMAIL ?? "",
+  // Branding for the React Email (CrmEmail) wrapper applied to every send.
+  brandName: process.env.BRAND_NAME ?? "Founder CRM",
+  brandColor: process.env.BRAND_COLOR ?? "#4f46e5",
+  brandLogoUrl: process.env.BRAND_LOGO_URL ?? "",
+  brandAddress: process.env.BRAND_ADDRESS ?? "",
   n8nWebhookSecret: process.env.N8N_WEBHOOK_SECRET ?? "",
   googlePlacesApiKey: process.env.GOOGLE_PLACES_API_KEY ?? "",
   glmApiKey: process.env.GLM_API_KEY ?? "",

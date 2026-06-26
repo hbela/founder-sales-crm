@@ -30,7 +30,7 @@ export function Templates() {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewTpl, setPreviewTpl] = useState<Template | null>(null);
   const [previewContact, setPreviewContact] = useState("");
-  const [preview, setPreview] = useState<{ subject: string; body: string } | null>(null);
+  const [preview, setPreview] = useState<{ subject: string; body: string; html: string } | null>(null);
   const [previewing, setPreviewing] = useState(false);
 
   const { data: contactsData } = useContacts({ page: 1 });
@@ -78,7 +78,7 @@ export function Templates() {
     if (!previewTpl || !previewContact) return;
     setPreviewing(true);
     try {
-      const res = await api.post<{ subject: string; body: string }>("/api/templates/preview", {
+      const res = await api.post<{ subject: string; body: string; html: string }>("/api/templates/preview", {
         templateId: previewTpl.id,
         contactId: previewContact,
       });
@@ -198,8 +198,13 @@ export function Templates() {
                   <p className="font-medium">{preview.subject}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Body</p>
-                  <p className="whitespace-pre-wrap text-sm">{preview.body}</p>
+                  <p className="text-xs text-muted-foreground">Rendered email</p>
+                  <iframe
+                    title="Email preview"
+                    sandbox=""
+                    srcDoc={preview.html}
+                    className="mt-1 h-[420px] w-full rounded-md border bg-white"
+                  />
                 </div>
               </div>
             )}
