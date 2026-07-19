@@ -29,6 +29,27 @@ A `video-generator` package containing four `tsx` scripts chained by one command
 | 4. Render video | `4-render-video.ts` | `demo.mp4` |
 | 5. Studio (visual preview) | `5-studio-props.ts` + `remotion studio` | live UI at `localhost:3000` |
 
+### Standard video structure (always use this ordering)
+
+Every demo video follows the same five-part organization:
+
+```
+BrandIntro (18 s) → BrandHero (12 s) → screenshot scenes (from USER_GUIDE.md) → BrandOutro (20 s)
+```
+
+1. **BrandIntro** — animated home page: the app logo drops in with a spring
+   bounce ("Logo Bounce Drop"), then the product name, tagline, and a short
+   feature list (≈5 lines) fade in one by one. Narrated.
+2. **BrandHero** — a full-bleed brand image with a slow Ken Burns zoom, a
+   bottom gradient, and two animated caption lines. For a receptionist-style
+   product this is a photo of a friendly receptionist on the phone
+   (AI-generate it once via the OpenAI Images API and commit it). Narrated.
+3. **Screenshot scenes** — one per `## Heading` in `USER_GUIDE.md`, framed as a
+   16:9 rounded card on a branded gradient backdrop with a white title chip.
+4. **BrandOutro** — thank-you page: logo fades in, then timed lines ("Thank
+   you for watching." / product one-liner / contact CTA / like-and-subscribe)
+   appear in sync with the narration, ending in a fade-out.
+
 ## Phase 1 — Detect the target environment (DO THIS FIRST)
 
 Before writing any code, determine these from the target repo. State findings to the user.
@@ -57,6 +78,8 @@ video-generator/
   .gitignore
   README.md
   public/.gitkeep
+  public/brand/logo.png          # committed (NOT gitignored): app logo, e.g. copied from the web app's pwa-512x512.png
+  public/brand/<hero>.png        # committed: AI-generated hero image (e.g. receptionist on the phone)
   src/
     input/USER_GUIDE.md
     lib/paths.ts
@@ -69,7 +92,14 @@ video-generator/
     scripts/4-render-video.ts
     remotion/Root.tsx
     remotion/DemoVideo.tsx
+    remotion/BrandLogo.tsx       # brand constants (colors, name, tagline, font stack)
+    remotion/BrandIntro.tsx      # animated logo + feature-list home page
+    remotion/BrandHero.tsx       # full-bleed hero image scene
+    remotion/BrandOutro.tsx      # animated thank-you page
 ```
+
+> `.gitignore` covers `public/screenshots/` and `public/audio/` only — keep
+> `public/brand/` committed so the logo and hero image travel with the repo.
 
 ### package.json
 
@@ -194,6 +224,22 @@ export function loadEnv(): void {
 import { z } from "zod";
 
 export const FPS = 30;
+
+/** Animated brand intro: logo bounce + name + tagline + feature list (18 s). */
+export const INTRO_DURATION_IN_FRAMES = 540;
+
+/** Full-bleed hero image scene (12 s). */
+export const HERO_DURATION_IN_FRAMES = 360;
+
+/** Animated thank-you outro (20 s). */
+export const OUTRO_DURATION_IN_FRAMES = 600;
+
+/** Narration audio for the fixed (non-screenshot) scenes; null = silent. */
+export type ExtraAudio = {
+  intro: string | null;
+  hero: string | null;
+  outro: string | null;
+};
 
 export const sceneSchema = z.object({
   id: z.string().min(1),
@@ -382,6 +428,13 @@ console.log(`✓ Captured ${scenes.length} screenshots into ${SCREENSHOTS_DIR}`)
 
 Skips existing tracks (re-runs only fill gaps). Exits 0 with no API key so the pipeline still renders a silent video.
 
+**Also generates the brand-scene tracks**: define an `EXTRA_TRACKS: Record<string, string>`
+map with `intro` / `hero` / `outro` narration texts (write them to fit the
+`*_DURATION_IN_FRAMES` constants: intro ≈ 45–50 words, hero ≈ 30, outro ≈ 50),
+and iterate `[...extraTracks, ...scenes]` through the same skip-if-exists TTS
+loop so `audio/intro.mp3`, `audio/hero.mp3`, `audio/outro.mp3` are produced
+alongside the scene narrations.
+
 ```ts
 import { existsSync } from "node:fs";
 import fs from "node:fs/promises";
@@ -432,6 +485,12 @@ console.log(`✓ Generated ${generated}, skipped ${skipped}, failed ${failed} �
 
 Bundles the Remotion entry with `publicDir`, enriches scenes with audio paths (only if files exist), renders h264 mp4.
 
+**inputProps must include `extraAudio`**: build it with an `audioIfExists(id)`
+helper (`existsSync(path.join(AUDIO_DIR, `${id}.mp3`)) ? `audio/${id}.mp3` : null`)
+for `intro` / `hero` / `outro`, and pass `{ scenes: scenesWithAudio, extraAudio }`.
+The same applies to `5-studio-props.ts` — the Studio props file must carry
+`extraAudio` too, or the brand scenes preview silent.
+
 ```ts
 import { existsSync } from "node:fs";
 import fs from "node:fs/promises";
@@ -479,12 +538,15 @@ console.log(`✓ Rendered video to ${VIDEO_OUTPUT}`);
 
 ### src/remotion/Root.tsx
 
-**MUST call `registerRoot()`.** Dynamic duration via `calculateMetadata`.
+**MUST call `registerRoot()`.** Dynamic duration via `calculateMetadata` — intro + hero + scenes + outro.
 
 ```tsx
 import { Composition, registerRoot } from "remotion";
 import { DemoVideo } from "./DemoVideo";
-import { FPS, type SceneWithAudio } from "../lib/schema";
+import {
+  FPS, HERO_DURATION_IN_FRAMES, INTRO_DURATION_IN_FRAMES, OUTRO_DURATION_IN_FRAMES,
+  type ExtraAudio, type SceneWithAudio,
+} from "../lib/schema";
 
 export const RemotionRoot = () => {
   return (
@@ -495,9 +557,17 @@ export const RemotionRoot = () => {
       fps={FPS}
       width={1920}
       height={1080}
-      defaultProps={{ scenes: [] as SceneWithAudio[] }}
+      defaultProps={{
+        scenes: [] as SceneWithAudio[],
+        extraAudio: { intro: null, hero: null, outro: null } as ExtraAudio,
+      }}
       calculateMetadata={({ props }) => ({
-        durationInFrames: Math.max(1, props.scenes.reduce((sum, s) => sum + Math.round(s.durationSeconds * FPS), 0)),
+        durationInFrames: Math.max(
+          1,
+          INTRO_DURATION_IN_FRAMES + HERO_DURATION_IN_FRAMES +
+            props.scenes.reduce((sum, s) => sum + Math.round(s.durationSeconds * FPS), 0) +
+            OUTRO_DURATION_IN_FRAMES,
+        ),
       })}
     />
   );
@@ -508,14 +578,26 @@ registerRoot(RemotionRoot);
 
 ### src/remotion/DemoVideo.tsx
 
-`<Sequence>` per scene (scopes audio). Ken Burns zoom, title card, optional `<Audio>`.
+Lays out the standard structure: intro → hero → one `<Sequence>` per scene (scopes audio) → outro. Screenshot scenes render as a 16:9 rounded card on a branded gradient with a Ken Burns zoom and a white title chip.
 
 ```tsx
 import { AbsoluteFill, Audio, Img, Sequence, interpolate, staticFile, useCurrentFrame } from "remotion";
-import { FPS, type SceneWithAudio } from "../lib/schema";
+import {
+  FPS, HERO_DURATION_IN_FRAMES, INTRO_DURATION_IN_FRAMES, OUTRO_DURATION_IN_FRAMES,
+  type ExtraAudio, type SceneWithAudio,
+} from "../lib/schema";
+import { BrandHero } from "./BrandHero";
+import { BrandIntro } from "./BrandIntro";
+import { BrandOutro } from "./BrandOutro";
+import { BRAND_BG, BRAND_DARK, BRAND_PRIMARY, FONT_STACK } from "./BrandLogo";
 
-export function DemoVideo({ scenes = [] }: { scenes: SceneWithAudio[] }) {
-  let offset = 0;
+const NO_EXTRA_AUDIO: ExtraAudio = { intro: null, hero: null, outro: null };
+
+export function DemoVideo({
+  scenes = [],
+  extraAudio = NO_EXTRA_AUDIO,
+}: { scenes: SceneWithAudio[]; extraAudio?: ExtraAudio }) {
+  let offset = INTRO_DURATION_IN_FRAMES + HERO_DURATION_IN_FRAMES;
   const segments = scenes.map((scene) => {
     const durationInFrames = Math.max(1, Math.round(scene.durationSeconds * FPS));
     const from = offset;
@@ -524,12 +606,21 @@ export function DemoVideo({ scenes = [] }: { scenes: SceneWithAudio[] }) {
   });
 
   return (
-    <AbsoluteFill style={{ backgroundColor: "#eaf6ff" }}>
+    <AbsoluteFill style={{ backgroundColor: BRAND_BG }}>
+      <Sequence from={0} durationInFrames={INTRO_DURATION_IN_FRAMES}>
+        <BrandIntro audio={extraAudio.intro} />
+      </Sequence>
+      <Sequence from={INTRO_DURATION_IN_FRAMES} durationInFrames={HERO_DURATION_IN_FRAMES}>
+        <BrandHero audio={extraAudio.hero} />
+      </Sequence>
       {segments.map(({ scene, from, durationInFrames }) => (
         <Sequence key={scene.id} from={from} durationInFrames={durationInFrames}>
           <SceneFrame scene={scene} durationInFrames={durationInFrames} />
         </Sequence>
       ))}
+      <Sequence from={offset} durationInFrames={OUTRO_DURATION_IN_FRAMES}>
+        <BrandOutro audio={extraAudio.outro} />
+      </Sequence>
     </AbsoluteFill>
   );
 }
@@ -538,16 +629,53 @@ function SceneFrame({ scene, durationInFrames }: { scene: SceneWithAudio; durati
   const frame = useCurrentFrame();
   const scale = interpolate(frame, [0, durationInFrames], [1, 1.06]);
   return (
-    <AbsoluteFill>
-      <Img src={staticFile(scene.screenshot)} style={{ width: "100%", height: "100%", objectFit: "contain", transform: `scale(${scale})` }} />
+    <AbsoluteFill
+      style={{
+        background: `linear-gradient(135deg, ${BRAND_DARK} 0%, ${BRAND_PRIMARY} 100%)`,
+        padding: "72px 96px", display: "flex", justifyContent: "center", alignItems: "center",
+      }}
+    >
       {scene.audio ? <Audio src={staticFile(scene.audio)} /> : null}
-      <div style={{ position: "absolute", bottom: 80, left: 100, fontSize: 52, fontWeight: 700, color: "#0f172a", background: "white", padding: "24px 36px", borderRadius: 24, boxShadow: "0 10px 30px rgba(0,0,0,0.15)" }}>
-        {scene.title}
+      <div
+        style={{
+          position: "relative", height: "100%", maxWidth: "100%", aspectRatio: "16 / 9",
+          borderRadius: 28, overflow: "hidden", boxShadow: "0 40px 90px rgba(0,0,0,0.45)",
+          border: "1px solid rgba(255,255,255,0.12)",
+        }}
+      >
+        <Img src={staticFile(scene.screenshot)} style={{ width: "100%", height: "100%", objectFit: "cover", transform: `scale(${scale})` }} />
+        <div style={{ position: "absolute", bottom: 32, left: 40, fontSize: 48, fontWeight: 700, fontFamily: FONT_STACK, color: BRAND_DARK, background: "white", padding: "20px 32px", borderRadius: 20, boxShadow: "0 10px 30px rgba(0,0,0,0.2)" }}>
+          {scene.title}
+        </div>
       </div>
     </AbsoluteFill>
   );
 }
 ```
+
+### src/remotion/BrandLogo.tsx, BrandIntro.tsx, BrandHero.tsx, BrandOutro.tsx
+
+Copy these from the Sunshine Dental reference implementation and re-brand:
+
+- **BrandLogo.tsx** — exports `BRAND_PRIMARY`, `BRAND_DARK`, `BRAND_BG`,
+  `BRAND_NAME`, `BRAND_TAGLINE`, `FONT_STACK`, all derived from the target
+  app's CSS variables. Every other brand component imports from here, so
+  re-branding a new app is a one-file change.
+- **BrandIntro.tsx** — spring "Logo Bounce Drop" (`spring({ damping: 8, stiffness: 120, mass: 0.8 })`
+  driving `translateY` from −500, plus a squash-stretch spring), then name,
+  tagline, and ≈5 feature lines staggered ~15 frames apart from frame 75.
+  Uses `staticFile("brand/logo.png")` and takes `audio: string | null`.
+- **BrandHero.tsx** — full-bleed `staticFile("brand/<hero>.png")` with a slow
+  zoom (1 → 1.08), a `linear-gradient(to top, …)` scrim, and two caption
+  lines fading in (~frames 30 and 70). Takes `audio: string | null`.
+- **BrandOutro.tsx** — logo fade-in, then a `LINES` array of
+  `{ text, start, size, weight }` items appearing in sync with the outro
+  narration; fade-out over the last 25 frames. Takes `audio: string | null`.
+
+**Audio-as-prop, not hardcoded**: each brand component renders
+`{audio ? <Audio src={staticFile(audio)} /> : null}` and the render/studio
+scripts pass `extraAudio` built with `existsSync` checks — this keeps the
+"no API key → silent render" guarantee working for the brand scenes too.
 
 ### README.md
 
@@ -634,9 +762,55 @@ These were all hit and fixed during the reference implementation — do NOT skip
 - **Install `@remotion/cli`**: needed for the Studio command (`remotion studio`).
 - **Studio port conflict**: `remotion studio` reads the `PORT` env var, which in many apps is already taken (e.g. an API server on 4000). Always pass `--port 3000` (or another free port) explicitly to avoid "port not available" errors.
 - **Studio needs a props file**: the Studio can't read `scenes.json` directly — generate `{ scenes: SceneWithAudio[] }` (with resolved audio paths) via a helper script and pass it with `--props <path>`. Otherwise the Studio shows an empty composition.
+- **TTS length vs scene length**: audio is hard-cut at its `<Sequence>` boundary. After generating the brand tracks, probe the mp3 durations (ffmpeg) and make sure each fits its `*_DURATION_IN_FRAMES` constant with ~1 s to spare — TTS speaking rate varies, so word-count estimates alone are not enough. Bump the constant (animations key off it) rather than trimming the narration.
 - **zod version**: Remotion 4 requires zod 4.3.6 — pin it exactly (`"zod": "4.3.6"`, no `^`). The openai SDK declares zod 3 as a peer dep, but the warning is non-fatal and TTS works fine with zod 4. Do NOT use zod 3 — it causes the Remotion Studio to crash/disconnect at runtime (React context breaks).
 - **shadcn/oklch theming** (when capturing a shadcn app): if CSS vars hold full color values, `tailwind.config` colors must be bare `var(--x)`, not `hsl(var(--x))`, or the theme won't render in screenshots.
 
+## Multi-language videos (optional)
+
+If the target app is multilingual, make the pipeline language-aware from the
+start (see the Sunshine Dental reference for a working implementation):
+
+- `VIDEO_LANG` env var selects the language (default `en`). Make `loadEnv()`
+  restore shell-set vars after reading `.env` files so `VIDEO_LANG=hu pnpm video`
+  works without editing `.env` (snapshot `process.env` before dotenv, reassign after).
+- Guide file per language: `USER_GUIDE.md` (en) / `USER_GUIDE.<lang>.md`.
+- Per-language asset dirs: `screenshots/<lang>/…`, `audio/<lang>/…`, output
+  `demo-<lang>.mp4` — so languages never clobber each other.
+- Capture forces the app's UI language (e.g. pre-seeded localStorage key).
+- All brand-scene copy (tagline, features, hero captions, outro lines) lives in
+  a browser-safe `lib/brand-text.ts` keyed by language; components take a
+  `lang` prop passed through inputProps.
+- **Brand-scene durations must be per-language** (`introSeconds` etc. in
+  `brand-text.ts`): TTS pacing differs a lot by language (Hungarian ran ~40%
+  longer than English for the same content) and audio is hard-cut at the
+  Sequence boundary. `calculateMetadata` reads them from `brandText(props.lang)`.
+- Auto-fit scene duration at ~13 chars/sec + 2 s (15 chars/sec fits English but
+  clips slower languages).
+- `slugify` must strip accents (NFD normalize + drop combining marks) so
+  localized headings make clean file names.
+
+## Brand assets
+
+- **Logo**: copy the target app's existing icon (e.g. `public/pwa-512x512.png`)
+  to `public/brand/logo.png` — don't redraw it.
+- **Hero image**: AI-generate once and commit to `public/brand/`. Use the
+  OpenAI Images API (`gpt-image-1.5`, size `1536x1024`) with a narrative
+  5-part prompt (image type → subject → environment → technical specs →
+  constraints), e.g. a photorealistic receptionist on the phone in the brand's
+  color world, ending with "No text, no watermarks, no logos".
+- Keep `public/brand/` OUT of `.gitignore` (only `public/screenshots/` and
+  `public/audio/` are generated artifacts).
+
 ## Reference implementation
 
-A working, verified implementation lives at `packages/video-generator/` in the **Founder Sales CRM** repo (`C:\devs\prods\founder-sales-crm`). Use it as the source of truth when adapting to a new app.
+Working, verified implementations live at `packages/video-generator/` in:
+
+- **Sunshine Dental** (`C:\devs\prods\sunshine-dental`) — the most complete
+  reference: full intro → hero → scenes → outro structure with prop-driven
+  brand-scene audio (`ExtraAudio`), committed `public/brand/` assets, an
+  `EXTRA_TRACKS` TTS map, and a capture-script preflight that verifies
+  `${APP_URL}/api/health` really is the target API before shooting.
+- **Founder Sales CRM** (`C:\devs\prods\founder-sales-crm`) — the original
+  implementation (intro/outro hardcode their audio paths; prefer the
+  prop-driven variant above for new apps).
